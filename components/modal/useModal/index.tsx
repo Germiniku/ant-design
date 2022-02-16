@@ -22,13 +22,12 @@ const ElementsHolder = React.memo(
     const [elements, patchElement] = usePatchElement();
     React.useImperativeHandle(
       ref,
-      () => {
-        return {
-          patchElement,
-        };
-      },
+      () => ({
+        patchElement,
+      }),
       [],
     );
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{elements}</>;
   }),
 );
@@ -36,9 +35,24 @@ const ElementsHolder = React.memo(
 export default function useModal(): [Omit<ModalStaticFunctions, 'warn'>, React.ReactElement] {
   const holderRef = React.useRef<ElementsHolderRef>(null as any);
 
+  // ========================== Effect ==========================
+  const [actionQueue, setActionQueue] = React.useState<(() => void)[]>([]);
+
+  React.useEffect(() => {
+    if (actionQueue.length) {
+      const cloneQueue = [...actionQueue];
+      cloneQueue.forEach(action => {
+        action();
+      });
+
+      setActionQueue([]);
+    }
+  }, [actionQueue]);
+
+  // =========================== Hook ===========================
   const getConfirmFunc = React.useCallback(
-    (withFunc: (config: ModalFuncProps) => ModalFuncProps) => {
-      return function hookConfirm(config: ModalFuncProps) {
+    (withFunc: (config: ModalFuncProps) => ModalFuncProps) =>
+      function hookConfirm(config: ModalFuncProps) {
         uuid += 1;
 
         const modalRef = React.createRef<HookModalRef>();
@@ -59,18 +73,29 @@ export default function useModal(): [Omit<ModalStaticFunctions, 'warn'>, React.R
 
         return {
           destroy: () => {
+            function destroyAction() {
+              modalRef.current?.destroy();
+            }
+
             if (modalRef.current) {
-              modalRef.current.destroy();
+              destroyAction();
+            } else {
+              setActionQueue(prev => [...prev, destroyAction]);
             }
           },
           update: (newConfig: ModalFuncProps) => {
+            function updateAction() {
+              modalRef.current?.update(newConfig);
+            }
+
             if (modalRef.current) {
-              modalRef.current.update(newConfig);
+              updateAction();
+            } else {
+              setActionQueue(prev => [...prev, updateAction]);
             }
           },
         };
-      };
-    },
+      },
     [],
   );
 

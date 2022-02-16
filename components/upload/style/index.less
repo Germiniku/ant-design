@@ -7,7 +7,7 @@
 @upload-picture-card-border-style: @border-style-base;
 
 .@{upload-prefix-cls} {
-  .reset-component;
+  .reset-component();
 
   outline: 0;
 
@@ -121,6 +121,7 @@
       color: @disabled-color;
       font-size: 30px;
       transition: all 0.3s;
+
       &:hover {
         color: @text-color-secondary;
       }
@@ -131,7 +132,7 @@
   }
 
   &-picture-card-wrapper {
-    .clearfix;
+    .clearfix();
 
     display: inline-block;
     width: 100%;
@@ -139,8 +140,8 @@
 }
 
 .@{upload-prefix-cls}-list {
-  .reset-component;
-  .clearfix;
+  .reset-component();
+  .clearfix();
   line-height: @line-height-base;
 
   // ============================ Item ============================
@@ -149,6 +150,7 @@
     height: @line-height-base * @font-size-base;
     margin-top: @margin-xs;
     font-size: @font-size-base;
+
     &-name {
       display: inline-block;
       width: 100%;
@@ -201,7 +203,7 @@
       .@{upload-prefix-cls}-text-icon {
         .@{iconfont-css-prefix} {
           position: absolute;
-          top: @font-size-base / 2 - 2px;
+          top: (@font-size-base / 2) - 2px;
           color: @text-color-secondary;
           font-size: @font-size-base;
         }
@@ -246,6 +248,7 @@
       .@{iconfont-css-prefix} {
         color: @error-color;
       }
+
       &-btn {
         opacity: 1;
       }
@@ -295,7 +298,7 @@
     .@{upload-item}-thumbnail {
       width: 48px;
       height: 48px;
-      line-height: 54px;
+      line-height: 60px;
       text-align: center;
       opacity: 0.8;
 
@@ -309,7 +312,7 @@
       .@{iconfont-css-prefix} {
         svg path {
           &[fill='#e6f7ff'] {
-            fill: color(~`colorPalette('@{error-color}', 1) `);
+            fill: @error-color-deprecated-bg;
           }
 
           &[fill='#1890ff'] {
@@ -357,7 +360,7 @@
     }
 
     .@{upload-item}-uploading .@{upload-item}-name {
-      line-height: 28px;
+      margin-bottom: 12px;
     }
 
     .@{upload-item}-progress {
@@ -527,6 +530,7 @@
 
     .@{upload-item}-name {
       flex: auto;
+      margin: 0;
       padding: 0 @padding-xs;
     }
 

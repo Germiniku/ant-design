@@ -17,16 +17,14 @@ import ErrorBoundary from './ErrorBoundary';
 import { replaceElement } from '../_util/reactNode';
 
 export interface AlertProps {
-  /**
-   * Type of Alert styles, options:`success`, `info`, `warning`, `error`
-   */
+  /** Type of Alert styles, options:`success`, `info`, `warning`, `error` */
   type?: 'success' | 'info' | 'warning' | 'error';
   /** Whether Alert can be closed */
   closable?: boolean;
   /** Close text to show */
   closeText?: React.ReactNode;
   /** Content of Alert */
-  message: React.ReactNode;
+  message?: React.ReactNode;
   /** Additional content of Alert */
   description?: React.ReactNode;
   /** Callback when close Alert */
@@ -42,6 +40,8 @@ export interface AlertProps {
   className?: string;
   banner?: boolean;
   icon?: React.ReactNode;
+  /** Custome closeIcon */
+  closeIcon?: React.ReactNode;
   action?: React.ReactNode;
   onMouseEnter?: React.MouseEventHandler<HTMLDivElement>;
   onMouseLeave?: React.MouseEventHandler<HTMLDivElement>;
@@ -80,6 +80,7 @@ const Alert: AlertInterface = ({
   showIcon,
   closable,
   closeText,
+  closeIcon = <CloseOutlined />,
   action,
   ...props
 }) => {
@@ -121,22 +122,17 @@ const Alert: AlertInterface = ({
     return React.createElement(iconType, { className: `${prefixCls}-icon` });
   };
 
-  const renderCloseIcon = () => {
-    return isClosable ? (
+  const renderCloseIcon = () =>
+    isClosable ? (
       <button
         type="button"
         onClick={handleClose}
         className={`${prefixCls}-close-icon`}
         tabIndex={0}
       >
-        {closeText ? (
-          <span className={`${prefixCls}-close-text`}>{closeText}</span>
-        ) : (
-          <CloseOutlined />
-        )}
+        {closeText ? <span className={`${prefixCls}-close-text`}>{closeText}</span> : closeIcon}
       </button>
     ) : null;
-  };
 
   // banner 模式默认有 Icon
   const isShowIcon = banner && showIcon === undefined ? true : showIcon;
@@ -180,12 +176,10 @@ const Alert: AlertInterface = ({
         >
           {isShowIcon ? renderIconNode() : null}
           <div className={`${prefixCls}-content`}>
-            <div className={`${prefixCls}-message`}>{message}</div>
-            <div className={`${prefixCls}-description`}>{description}</div>
+            {message ? <div className={`${prefixCls}-message`}>{message}</div> : null}
+            {description ? <div className={`${prefixCls}-description`}>{description}</div> : null}
           </div>
-
           {action ? <div className={`${prefixCls}-action`}>{action}</div> : null}
-
           {renderCloseIcon()}
         </div>
       )}

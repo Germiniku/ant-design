@@ -2,7 +2,7 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { ConfigConsumer, ConfigConsumerProps } from '../config-provider';
 
-export interface CardGridProps {
+export interface CardGridProps extends React.HTMLAttributes<HTMLDivElement> {
   prefixCls?: string;
   className?: string;
   hoverable?: boolean;
@@ -13,13 +13,9 @@ const Grid: React.FC<CardGridProps> = ({ prefixCls, className, hoverable = true,
   <ConfigConsumer>
     {({ getPrefixCls }: ConfigConsumerProps) => {
       const prefix = getPrefixCls('card', prefixCls);
-      const classString = classNames(
-        `${prefix}-grid`,
-        className,
-        {
-          [`${prefix}-grid-hoverable`]: hoverable,
-        },
-      );
+      const classString = classNames(`${prefix}-grid`, className, {
+        [`${prefix}-grid-hoverable`]: hoverable,
+      });
 
       return <div {...props} className={classString} />;
     }}

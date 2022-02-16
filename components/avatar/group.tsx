@@ -15,6 +15,7 @@ export interface GroupProps {
   maxCount?: number;
   maxStyle?: React.CSSProperties;
   maxPopoverPlacement?: 'top' | 'bottom';
+  maxPopoverTrigger?: 'hover' | 'focus' | 'click';
   /*
    * Size of avatar, options: `large`, `small`, `default`
    * or a custom number size
@@ -36,12 +37,12 @@ const Group: React.FC<GroupProps> = props => {
     className,
   );
 
-  const { children, maxPopoverPlacement = 'top' } = props;
-  const childrenWithProps = toArray(children).map((child, index) => {
-    return cloneElement(child, {
+  const { children, maxPopoverPlacement = 'top', maxPopoverTrigger = 'hover' } = props;
+  const childrenWithProps = toArray(children).map((child, index) =>
+    cloneElement(child, {
       key: `avatar-key-${index}`,
-    });
-  });
+    }),
+  );
 
   const numOfChildren = childrenWithProps.length;
   if (maxCount && maxCount < numOfChildren) {
@@ -51,7 +52,7 @@ const Group: React.FC<GroupProps> = props => {
       <Popover
         key="avatar-popover-key"
         content={childrenHidden}
-        trigger="hover"
+        trigger={maxPopoverTrigger}
         placement={maxPopoverPlacement}
         overlayClassName={`${prefixCls}-popover`}
       >

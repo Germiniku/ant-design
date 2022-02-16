@@ -1,4 +1,5 @@
 import * as React from 'react';
+import memoizeOne from 'memoize-one';
 import { ValidateMessages } from 'rc-field-form/lib/interface';
 import devWarning from '../_util/devWarning';
 
@@ -18,22 +19,30 @@ export interface Locale {
   locale: string;
   Pagination?: PaginationLocale;
   DatePicker?: DatePickerLocale;
-  TimePicker?: Object;
-  Calendar?: Object;
+  TimePicker?: Record<string, any>;
+  Calendar?: Record<string, any>;
   Table?: TableLocale;
   Modal?: ModalLocale;
   Popconfirm?: PopconfirmLocale;
   Transfer?: Partial<TransferLocale>;
-  Select?: Object;
+  Select?: Record<string, any>;
   Upload?: UploadLocale;
   Empty?: TransferLocaleForEmpty;
-  global?: Object;
-  PageHeader?: Object;
-  Icon?: Object;
-  Text?: Object;
+  global?: Record<string, any>;
+  PageHeader?: { back: string };
+  Icon?: Record<string, any>;
+  Text?: {
+    edit?: any;
+    copy?: any;
+    copied?: any;
+    expand?: any;
+  };
   Form?: {
     optional?: string;
     defaultValidateMessages: ValidateMessages;
+  };
+  Image?: {
+    preview: string;
   };
 }
 
@@ -59,6 +68,10 @@ export default class LocaleProvider extends React.Component<LocaleProviderProps,
     );
   }
 
+  componentDidMount() {
+    changeConfirmLocale(this.props.locale && this.props.locale.Modal);
+  }
+
   componentDidUpdate(prevProps: LocaleProviderProps) {
     const { locale } = this.props;
     if (prevProps.locale !== locale) {
@@ -70,11 +83,14 @@ export default class LocaleProvider extends React.Component<LocaleProviderProps,
     changeConfirmLocale();
   }
 
+  getMemoizedContextValue = memoizeOne((localeValue: Locale): Locale & { exist?: boolean } => ({
+    ...localeValue,
+    exist: true,
+  }));
+
   render() {
     const { locale, children } = this.props;
-
-    return (
-      <LocaleContext.Provider value={{ ...locale, exist: true }}>{children}</LocaleContext.Provider>
-    );
+    const contextValue = this.getMemoizedContextValue(locale);
+    return <LocaleContext.Provider value={contextValue}>{children}</LocaleContext.Provider>;
   }
 }

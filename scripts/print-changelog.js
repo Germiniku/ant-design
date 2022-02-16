@@ -3,7 +3,7 @@ const chalk = require('chalk');
 const { spawn } = require('child_process');
 const jsdom = require('jsdom');
 const jQuery = require('jquery');
-const fetch = require('node-fetch');
+const fetch = require('isomorphic-fetch');
 const open = require('open');
 const fs = require('fs-extra');
 const path = require('path');
@@ -34,7 +34,7 @@ const MAINTAINERS = [
   'hengkx',
   'Rustin-Liu',
   'fireairforce',
-  'Kermit-Xuan',
+  'kerm1it',
 ].map(author => author.toLowerCase());
 
 const cwd = process.cwd();
@@ -199,9 +199,9 @@ async function printLog() {
   console.log('\n');
   console.log(chalk.yellow('🇨🇳 Chinese changelog:'));
   console.log('\n');
-  printPR('chinese', chinese => {
-    return chinese[chinese.length - 1] === '。' || !chinese ? chinese : `${chinese}。`;
-  });
+  printPR('chinese', chinese =>
+    chinese[chinese.length - 1] === '。' || !chinese ? chinese : `${chinese}。`,
+  );
 
   console.log('\n-----\n');
 

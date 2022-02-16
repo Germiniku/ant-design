@@ -1,8 +1,8 @@
 import * as React from 'react';
-import RcTree, { TreeNode, TreeProps as RcTreeProps } from 'rc-tree';
+import HolderOutlined from '@ant-design/icons/HolderOutlined';
+import RcTree, { TreeNode, TreeProps as RcTreeProps, BasicDataNode } from 'rc-tree';
 import classNames from 'classnames';
 import { DataNode, Key } from 'rc-tree/lib/interface';
-
 import DirectoryTree from './DirectoryTree';
 import { ConfigContext } from '../config-provider';
 import collapseMotion from '../_util/motion';
@@ -92,14 +92,21 @@ export interface AntTreeNodeDropEvent {
 // [Legacy] Compatible for v3
 export type TreeNodeNormal = DataNode;
 
-export interface TreeProps extends Omit<RcTreeProps, 'prefixCls' | 'showLine' | 'direction'> {
+type DraggableFn = (node: AntTreeNode) => boolean;
+interface DraggableConfig {
+  icon?: React.ReactNode | false;
+  nodeDraggable?: DraggableFn;
+}
+
+export interface TreeProps<T extends BasicDataNode = DataNode>
+  extends Omit<RcTreeProps<T>, 'prefixCls' | 'showLine' | 'direction' | 'draggable'> {
   showLine?: boolean | { showLeafIcon: boolean };
   className?: string;
   /** 是否支持多选 */
   multiple?: boolean;
   /** 是否自动展开父节点 */
   autoExpandParent?: boolean;
-  /** checkable状态下节点选择完全受控（父子节点选中状态不再关联） */
+  /** Checkable状态下节点选择完全受控（父子节点选中状态不再关联） */
   checkStrictly?: boolean;
   /** 是否支持选中 */
   checkable?: boolean;
@@ -126,7 +133,7 @@ export interface TreeProps extends Omit<RcTreeProps, 'prefixCls' | 'showLine' | 
   filterAntTreeNode?: (node: AntTreeNode) => boolean;
   loadedKeys?: Key[];
   /** 设置节点可拖拽（IE>8） */
-  draggable?: ((node: DataNode) => boolean) | boolean;
+  draggable?: DraggableFn | boolean | DraggableConfig;
   style?: React.CSSProperties;
   showIcon?: boolean;
   icon?: ((nodeProps: AntdTreeNodeAttribute) => React.ReactNode) | React.ReactNode;
@@ -136,11 +143,13 @@ export interface TreeProps extends Omit<RcTreeProps, 'prefixCls' | 'showLine' | 
   blockNode?: boolean;
 }
 
-interface CompoundedComponent
-  extends React.ForwardRefExoticComponent<TreeProps & React.RefAttributes<RcTree>> {
+type CompoundedComponent = (<T extends BasicDataNode | DataNode = DataNode>(
+  props: React.PropsWithChildren<TreeProps<T>> & { ref?: React.Ref<RcTree> },
+) => React.ReactElement) & {
+  defaultProps: Partial<React.PropsWithChildren<TreeProps<any>>>;
   TreeNode: typeof TreeNode;
   DirectoryTree: typeof DirectoryTree;
-}
+};
 
 const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
   const { getPrefixCls, direction, virtual } = React.useContext(ConfigContext);
@@ -153,6 +162,8 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
     blockNode,
     children,
     checkable,
+    selectable,
+    draggable,
   } = props;
   const prefixCls = getPrefixCls('tree', customizePrefixCls);
   const newProps = {
@@ -160,6 +171,33 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
     showLine: Boolean(showLine),
     dropIndicatorRender,
   };
+
+  const draggableConfig = React.useMemo(() => {
+    if (!draggable) {
+      return false;
+    }
+
+    let mergedDraggable: DraggableConfig = {};
+    switch (typeof draggable) {
+      case 'function':
+        mergedDraggable.nodeDraggable = draggable;
+        break;
+
+      case 'object':
+        mergedDraggable = { ...draggable };
+        break;
+
+      default:
+      // Do nothing
+    }
+
+    if (mergedDraggable.icon !== false) {
+      mergedDraggable.icon = mergedDraggable.icon || <HolderOutlined />;
+    }
+
+    return mergedDraggable;
+  }, [draggable]);
+
   return (
     <RcTree
       itemHeight={20}
@@ -171,20 +209,23 @@ const Tree = React.forwardRef<RcTree, TreeProps>((props, ref) => {
         {
           [`${prefixCls}-icon-hide`]: !showIcon,
           [`${prefixCls}-block-node`]: blockNode,
+          [`${prefixCls}-unselectable`]: !selectable,
           [`${prefixCls}-rtl`]: direction === 'rtl',
         },
         className,
       )}
       direction={direction}
       checkable={checkable ? <span className={`${prefixCls}-checkbox-inner`} /> : checkable}
+      selectable={selectable}
       switcherIcon={(nodeProps: AntTreeNodeProps) =>
         renderSwitcherIcon(prefixCls, switcherIcon, showLine, nodeProps)
       }
+      draggable={draggableConfig as any}
     >
       {children}
     </RcTree>
   );
-}) as CompoundedComponent;
+}) as unknown as CompoundedComponent;
 
 Tree.TreeNode = TreeNode;
 
@@ -192,6 +233,7 @@ Tree.DirectoryTree = DirectoryTree;
 
 Tree.defaultProps = {
   checkable: false,
+  selectable: true,
   showIcon: false,
   motion: {
     ...collapseMotion,

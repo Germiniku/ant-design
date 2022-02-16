@@ -1,10 +1,14 @@
+import * as React from 'react';
 import TestUtils, { act } from 'react-dom/test-utils';
 import CSSMotion from 'rc-motion';
+import { SmileOutlined } from '@ant-design/icons';
 import { genCSSMotion } from 'rc-motion/lib/CSSMotion';
 import KeyCode from 'rc-util/lib/KeyCode';
+import { resetWarned } from 'rc-util/lib/warning';
 import Modal from '..';
-import { destroyFns } from '../Modal';
+import destroyFns from '../destroyFns';
 import { sleep } from '../../../tests/utils';
+import ConfigProvider from '../../config-provider';
 
 const { confirm } = Modal;
 
@@ -18,9 +22,7 @@ describe('Modal.confirm triggers callbacks correctly', () => {
   });
 
   // Mock for rc-util raf
-  window.requestAnimationFrame = callback => {
-    return window.setTimeout(callback, 16);
-  };
+  window.requestAnimationFrame = callback => window.setTimeout(callback, 16);
   window.cancelAnimationFrame = id => {
     window.clearTimeout(id);
   };
@@ -145,9 +147,7 @@ describe('Modal.confirm triggers callbacks correctly', () => {
   it('should emit error when onOk return Promise.reject', async () => {
     const error = new Error('something wrong');
     open({
-      onOk: () => {
-        return Promise.reject(error);
-      },
+      onOk: () => Promise.reject(error),
     });
     $$('.ant-btn-primary')[0].click();
 
@@ -472,11 +472,31 @@ describe('Modal.confirm triggers callbacks correctly', () => {
     expect(onOk).toHaveBeenCalledTimes(3);
   });
 
-  it('should be able to config rootPrefixCls', () => {
+  it('should be able to global config rootPrefixCls', () => {
     jest.useFakeTimers();
+    ConfigProvider.config({ prefixCls: 'my', iconPrefixCls: 'bamboo' });
+    confirm({ title: 'title', icon: <SmileOutlined /> });
+    jest.runAllTimers();
+    expect(document.querySelectorAll('.ant-btn').length).toBe(0);
+    expect(document.querySelectorAll('.my-btn').length).toBe(2);
+    expect(document.querySelectorAll('.bamboo-smile').length).toBe(1);
+    expect(document.querySelectorAll('.my-modal-confirm').length).toBe(1);
+    ConfigProvider.config({ prefixCls: 'ant', iconPrefixCls: null });
+    jest.useRealTimers();
+  });
+
+  it('should be able to config rootPrefixCls', () => {
+    resetWarned();
+
+    jest.useFakeTimers();
+
     Modal.config({
       rootPrefixCls: 'my',
     });
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Warning: [antd: Modal] Modal.config is deprecated. Please use ConfigProvider.config instead.',
+    );
+
     confirm({
       title: 'title',
     });
@@ -497,8 +517,38 @@ describe('Modal.confirm triggers callbacks correctly', () => {
     expect(document.querySelectorAll('.your-btn').length).toBe(2);
     expect(document.querySelectorAll('.your-modal-confirm').length).toBe(1);
     Modal.config({
-      rootPrefixCls: 'ant',
+      rootPrefixCls: '',
     });
     jest.useRealTimers();
+  });
+
+  it('trigger afterClose once when click on cancel button', async () => {
+    const afterClose = jest.fn();
+    open({
+      afterClose,
+    });
+    // first Modal
+    $$('.ant-btn')[0].click();
+    expect(afterClose).not.toHaveBeenCalled();
+    await sleep(500);
+    expect(afterClose).toHaveBeenCalled();
+  });
+
+  it('trigger afterClose once when click on ok button', async () => {
+    const afterClose = jest.fn();
+    open({
+      afterClose,
+    });
+    // second Modal
+    $$('.ant-btn-primary')[0].click();
+    expect(afterClose).not.toHaveBeenCalled();
+    await sleep(500);
+    expect(afterClose).toHaveBeenCalled();
+  });
+
+  it('bodyStyle', async () => {
+    open({ bodyStyle: { width: 500 } });
+    const { width } = $$('.ant-modal-body')[0].style;
+    expect(width).toBe('500px');
   });
 });

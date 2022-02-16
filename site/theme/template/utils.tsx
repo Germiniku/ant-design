@@ -118,10 +118,10 @@ export function isZhCN(pathname: string) {
 export function getLocalizedPathname(
   path: string,
   zhCN?: boolean,
-  query = {},
+  query?: { [key: string]: any },
   hash?: {
-    zhCN: string;
-    enUS: string;
+    zhCN?: string;
+    enUS?: string;
   },
 ) {
   const pathname = path.startsWith('/') ? path : `/${path}`;
@@ -216,6 +216,4 @@ export function getMetaDescription(jml?: any[] | null) {
   return paragraph;
 }
 
-export const getThemeConfig = () => {
-  return themeConfig;
-};
+export const getThemeConfig = () => themeConfig;

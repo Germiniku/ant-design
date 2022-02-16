@@ -43,7 +43,7 @@ export interface ListProps<T> {
   loadMore?: React.ReactNode;
   pagination?: PaginationConfig | false;
   prefixCls?: string;
-  rowKey?: ((item: T) => string) | string;
+  rowKey?: ((item: T) => React.Key) | keyof T;
   renderItem?: (item: T, index: number) => React.ReactNode;
   size?: ListSize;
   split?: boolean;
@@ -99,55 +99,49 @@ function List<T>({
     total: 0,
   };
 
-  const keys: { [key: string]: string } = {};
+  const listItemsKeys: { [index: number]: React.Key } = {};
 
-  const triggerPaginationEvent = (eventName: string) => {
-    return (page: number, pageSize: number) => {
-      setPaginationCurrent(page);
-      setPaginationSize(pageSize);
-      if (pagination && (pagination as any)[eventName]) {
-        (pagination as any)[eventName](page, pageSize);
-      }
-    };
+  const triggerPaginationEvent = (eventName: string) => (page: number, pageSize: number) => {
+    setPaginationCurrent(page);
+    setPaginationSize(pageSize);
+    if (pagination && (pagination as any)[eventName]) {
+      (pagination as any)[eventName](page, pageSize);
+    }
   };
 
   const onPaginationChange = triggerPaginationEvent('onChange');
 
   const onPaginationShowSizeChange = triggerPaginationEvent('onShowSizeChange');
 
-  const renderInnerItem = (item: any, index: number) => {
+  const renderInnerItem = (item: T, index: number) => {
     if (!renderItem) return null;
 
     let key;
 
     if (typeof rowKey === 'function') {
       key = rowKey(item);
-    } else if (typeof rowKey === 'string') {
+    } else if (rowKey) {
       key = item[rowKey];
     } else {
-      key = item.key;
+      key = (item as any).key;
     }
 
     if (!key) {
       key = `list-item-${index}`;
     }
 
-    keys[index] = key;
+    listItemsKeys[index] = key;
 
     return renderItem(item, index);
   };
 
-  const isSomethingAfterLastItem = () => {
-    return !!(loadMore || pagination || footer);
-  };
+  const isSomethingAfterLastItem = () => !!(loadMore || pagination || footer);
 
-  const renderEmptyFunc = (prefixCls: string, renderEmptyHandler: RenderEmptyHandler) => {
-    return (
-      <div className={`${prefixCls}-empty-text`}>
-        {(locale && locale.emptyText) || renderEmptyHandler('List')}
-      </div>
-    );
-  };
+  const renderEmptyFunc = (prefixCls: string, renderEmptyHandler: RenderEmptyHandler) => (
+    <div className={`${prefixCls}-empty-text`}>
+      {(locale && locale.emptyText) || renderEmptyHandler('List')}
+    </div>
+  );
 
   const prefixCls = getPrefixCls('list', customizePrefixCls);
   let loadingProp = loading;
@@ -180,7 +174,7 @@ function List<T>({
       [`${prefixCls}-split`]: split,
       [`${prefixCls}-bordered`]: bordered,
       [`${prefixCls}-loading`]: isLoading,
-      [`${prefixCls}-grid`]: grid,
+      [`${prefixCls}-grid`]: !!grid,
       [`${prefixCls}-something-after-last-item`]: isSomethingAfterLastItem(),
       [`${prefixCls}-rtl`]: direction === 'rtl',
     },
@@ -246,9 +240,9 @@ function List<T>({
 
   let childrenContent = isLoading && <div style={{ minHeight: 53 }} />;
   if (splitDataSource.length > 0) {
-    const items = splitDataSource.map((item: any, index: number) => renderInnerItem(item, index));
-    const childrenList = React.Children.map(items, (child: any, index) => (
-      <div key={keys[index]} style={colStyle}>
+    const items = splitDataSource.map((item: T, index: number) => renderInnerItem(item, index));
+    const childrenList = React.Children.map(items, (child: React.ReactNode, index: number) => (
+      <div key={listItemsKeys[index]} style={colStyle}>
         {child}
       </div>
     ));
@@ -262,9 +256,13 @@ function List<T>({
   }
 
   const paginationPosition = paginationProps.position || 'bottom';
+  const contextValue = React.useMemo(
+    () => ({ grid, itemLayout }),
+    [JSON.stringify(grid), itemLayout],
+  );
 
   return (
-    <ListContext.Provider value={{ grid, itemLayout }}>
+    <ListContext.Provider value={contextValue}>
       <div className={classString} {...rest}>
         {(paginationPosition === 'top' || paginationPosition === 'both') && paginationContent}
         {header && <div className={`${prefixCls}-header`}>{header}</div>}

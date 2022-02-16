@@ -25,7 +25,7 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
   color = 'blue',
   dot,
   pending = false,
-  position, /** dead, but do not pass in <li {...omit()} */
+  position /** Dead, but do not pass in <li {...omit()} */,
   label,
   children,
   ...restProps
@@ -43,18 +43,17 @@ const TimelineItem: React.FC<TimelineItemProps> = ({
 
   const dotClassName = classNames({
     [`${prefixCls}-item-head`]: true,
-    [`${prefixCls}-item-head-custom`]: dot,
+    [`${prefixCls}-item-head-custom`]: !!dot,
     [`${prefixCls}-item-head-${color}`]: true,
   });
+
+  const customColor = /blue|red|green|gray/.test(color || '') ? undefined : color;
 
   return (
     <li {...restProps} className={itemClassName}>
       {label && <div className={`${prefixCls}-item-label`}>{label}</div>}
       <div className={`${prefixCls}-item-tail`} />
-      <div
-        className={dotClassName}
-        style={{ borderColor: /blue|red|green|gray/.test(color || '') ? undefined : color }}
-      >
+      <div className={dotClassName} style={{ borderColor: customColor, color: customColor }}>
         {dot}
       </div>
       <div className={`${prefixCls}-item-content`}>{children}</div>

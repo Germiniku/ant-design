@@ -101,7 +101,7 @@ exports[`renders ./components/auto-complete/demo/certain-category.md correctly 1
             class="ant-input-group-addon"
           >
             <button
-              class="ant-btn ant-btn-lg ant-btn-icon-only ant-input-search-button"
+              class="ant-btn ant-btn-default ant-btn-lg ant-btn-icon-only ant-input-search-button"
               type="button"
             >
               <span
@@ -153,7 +153,7 @@ exports[`renders ./components/auto-complete/demo/custom.md correctly 1`] = `
         aria-haspopup="listbox"
         aria-owns="undefined_list"
         autocomplete="off"
-        class="ant-input ant-select-selection-search-input"
+        class="ant-input ant-select-selection-search-input custom"
         placeholder="input here"
         role="combobox"
         style="height:50px"
@@ -257,7 +257,6 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                 class="ant-select-selection-search"
               >
                 <input
-                  aria-activedescendant="undefined_list_0"
                   aria-autocomplete="list"
                   aria-controls="undefined_list"
                   aria-haspopup="listbox"
@@ -343,7 +342,6 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                   class="ant-select-selection-search"
                 >
                   <input
-                    aria-activedescendant="undefined_list_0"
                     aria-autocomplete="list"
                     aria-controls="undefined_list"
                     aria-haspopup="listbox"
@@ -537,7 +535,6 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                   class="ant-select-selection-search"
                 >
                   <input
-                    aria-activedescendant="undefined_list_0"
                     aria-autocomplete="list"
                     aria-controls="undefined_list"
                     aria-haspopup="listbox"
@@ -678,7 +675,6 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                   class="ant-select-selection-search"
                 >
                   <input
-                    aria-activedescendant="undefined_list_0"
                     aria-autocomplete="list"
                     aria-controls="undefined_list"
                     aria-haspopup="listbox"
@@ -755,7 +751,7 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                         class="ant-input-group-addon"
                       >
                         <button
-                          class="ant-btn ant-btn-icon-only ant-input-search-button"
+                          class="ant-btn ant-btn-default ant-btn-icon-only ant-input-search-button"
                           type="button"
                         >
                           <span
@@ -828,7 +824,6 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                   class="ant-select-selection-search"
                 >
                   <input
-                    aria-activedescendant="undefined_list_0"
                     aria-autocomplete="list"
                     aria-controls="undefined_list"
                     aria-haspopup="listbox"
@@ -905,7 +900,7 @@ exports[`renders ./components/auto-complete/demo/form-debug.md correctly 1`] = `
                         class="ant-input-group-addon"
                       >
                         <button
-                          class="ant-btn ant-btn-icon-only ant-input-search-button"
+                          class="ant-btn ant-btn-default ant-btn-icon-only ant-input-search-button"
                           type="button"
                         >
                           <span

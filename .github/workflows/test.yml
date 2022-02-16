@@ -1,3 +1,5 @@
+# Origin Source
+# https://github.com/ant-design/ant-design/blob/79f566b7f8abb1012ef55b0d2793bfdf5595b85d/.github/workflows/test.yml
 name: ✅ test
 
 on: [push, pull_request]
@@ -7,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: cache package-lock.json
         uses: actions/cache@v2
@@ -16,7 +18,7 @@ jobs:
           key: lock-${{ github.sha }}
 
       - name: create package-lock.json
-        run: npm i --package-lock-only
+        run: npm i --package-lock-only --ignore-scripts
 
       - name: hack for single file
         run: |
@@ -24,7 +26,6 @@ jobs:
             mkdir package-temp-dir
           fi
           cp package-lock.json package-temp-dir
-
       - name: cache node_modules
         id: node_modules_cache_id
         uses: actions/cache@v2
@@ -40,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -77,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -95,11 +96,33 @@ jobs:
         run: npm run lint
     needs: setup
 
+  tsx-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: restore cache from package-lock.json
+        uses: actions/cache@v2
+        with:
+          path: package-temp-dir
+          key: lock-${{ github.sha }}
+
+      - name: restore cache from node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node_modules-${{ hashFiles('**/package-temp-dir/package-lock.json') }}
+
+      - name: tsx-demo
+        run: npm run check-ts-demo
+    needs: setup
+
   check_metadata:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -122,7 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -148,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -171,7 +194,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -202,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -233,7 +256,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -273,7 +296,7 @@ jobs:
       REACT: 16
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -301,7 +324,7 @@ jobs:
       REACT: 16
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -329,7 +352,7 @@ jobs:
       REACT: 16
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -365,7 +388,7 @@ jobs:
       REACT: 16
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -401,7 +424,7 @@ jobs:
       REACT: 16
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
       - name: restore cache from package-lock.json
         uses: actions/cache@v2
@@ -430,4 +453,47 @@ jobs:
         run: npm test
         env:
           LIB_DIR: dist
+    needs: setup
+
+  style:
+    name: style compile
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: restore cache from package-lock.json
+        uses: actions/cache@v2
+        with:
+          path: package-temp-dir
+          key: lock-${{ github.sha }}
+
+      - name: restore cache from node_modules
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: node_modules-${{ hashFiles('**/package-temp-dir/package-lock.json') }}
+
+      - name: compile
+        run: npm run compile
+
+      - name: dist
+        run: npm run dist
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+
+      - name: lessc default
+        run: npx lessc --js ./dist/antd.less
+
+      - name: lessc dark
+        run: npx lessc --js ./dist/antd.dark.less
+
+      - name: lessc variable
+        run: npx lessc --js ./dist/antd.variable.less
+
+      - name: lessc component
+        run: npx lessc --js ./es/button/style/index.less
+
+      - name: lessc mixins
+        run: npx lessc --js ./es/style/mixins/index.less
     needs: setup

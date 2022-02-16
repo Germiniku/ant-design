@@ -5,8 +5,8 @@
 @mention-prefix-cls: ~'@{ant-prefix}-mentions';
 
 .@{mention-prefix-cls} {
-  .reset-component;
-  .input;
+  .reset-component();
+  .input();
 
   position: relative;
   display: inline-block;
@@ -37,6 +37,7 @@
     overflow: inherit;
     overflow-x: hidden;
     overflow-y: auto;
+    /* stylelint-disable declaration-block-no-redundant-longhand-properties */
     font-weight: inherit;
     font-size: inherit;
     font-family: inherit;
@@ -45,6 +46,7 @@
     font-size-adjust: inherit;
     font-stretch: inherit;
     line-height: inherit;
+    /* stylelint-enable declaration-block-no-redundant-longhand-properties */
     direction: inherit;
     letter-spacing: inherit;
     white-space: inherit;
@@ -85,7 +87,7 @@
   // ================== Dropdown ==================
   &-dropdown {
     // Ref select dropdown style
-    .reset-component;
+    .reset-component();
 
     position: absolute;
     top: -9999px;

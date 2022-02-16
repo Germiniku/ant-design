@@ -9,7 +9,7 @@ exports[`Slider rtl render component should be rendered correctly in RTL directi
   />
   <div
     class="ant-slider-track"
-    style="right:0%;left:auto;width:0%"
+    style="right: 0%; width: 0%;"
   />
   <div
     class="ant-slider-step"
@@ -21,7 +21,7 @@ exports[`Slider rtl render component should be rendered correctly in RTL directi
     aria-valuenow="0"
     class="ant-slider-handle"
     role="slider"
-    style="right:0%;left:auto;transform:translateX(+50%)"
+    style="right: 0%; transform: translateX(+50%);"
     tabindex="0"
   />
   <div
@@ -111,32 +111,7 @@ exports[`Slider should show correct placement tooltip when set tooltipPlacement 
 </div>
 `;
 
-exports[`Slider should show correct placement tooltip when set tooltipPlacement 2`] = `
-<div>
-  <div
-    class="ant-tooltip ant-slider-tooltip ant-tooltip-hidden"
-    style="pointer-events:none"
-  >
-    <div
-      class="ant-tooltip-content"
-    >
-      <div
-        class="ant-tooltip-arrow"
-      >
-        <span
-          class="ant-tooltip-arrow-content"
-        />
-      </div>
-      <div
-        class="ant-tooltip-inner"
-        role="tooltip"
-      >
-        30
-      </div>
-    </div>
-  </div>
-</div>
-`;
+exports[`Slider should show correct placement tooltip when set tooltipPlacement 2`] = `<div />`;
 
 exports[`Slider should show tooltip when hovering slider handler 1`] = `
 <div>
@@ -165,29 +140,4 @@ exports[`Slider should show tooltip when hovering slider handler 1`] = `
 </div>
 `;
 
-exports[`Slider should show tooltip when hovering slider handler 2`] = `
-<div>
-  <div
-    class="ant-tooltip ant-slider-tooltip ant-tooltip-hidden"
-    style="pointer-events:none"
-  >
-    <div
-      class="ant-tooltip-content"
-    >
-      <div
-        class="ant-tooltip-arrow"
-      >
-        <span
-          class="ant-tooltip-arrow-content"
-        />
-      </div>
-      <div
-        class="ant-tooltip-inner"
-        role="tooltip"
-      >
-        30
-      </div>
-    </div>
-  </div>
-</div>
-`;
+exports[`Slider should show tooltip when hovering slider handler 2`] = `<div />`;
