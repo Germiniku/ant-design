@@ -486,4 +486,34 @@ describe('TextArea allowClear', () => {
 
     wrapper.unmount();
   });
+
+  // https://github.com/ant-design/ant-design/issues/31200
+  it('should not lost focus when clear input', () => {
+    const onBlur = jest.fn();
+    const wrapper = mount(<TextArea allowClear defaultValue="value" onBlur={onBlur} />, {
+      attachTo: document.body,
+    });
+    wrapper.find('textarea').getDOMNode().focus();
+    wrapper.find('.ant-input-clear-icon').at(0).simulate('mouseDown');
+    wrapper.find('.ant-input-clear-icon').at(0).simulate('click');
+    wrapper.find('.ant-input-clear-icon').at(0).simulate('mouseUp');
+    wrapper.find('.ant-input-clear-icon').at(0).simulate('focus');
+    wrapper.find('.ant-input-clear-icon').at(0).getDOMNode().click();
+    expect(onBlur).not.toBeCalled();
+    wrapper.unmount();
+  });
+
+  it('should focus text area after clear', () => {
+    const wrapper = mount(<TextArea allowClear defaultValue="111" />, { attachTo: document.body });
+    wrapper.find('.ant-input-clear-icon').at(0).simulate('click');
+    expect(document.activeElement).toBe(wrapper.find('textarea').at(0).getDOMNode());
+    wrapper.unmount();
+  });
+
+  it('should display boolean value as string', () => {
+    const wrapper = mount(<TextArea value />);
+    expect(wrapper.find('textarea').first().getDOMNode().value).toBe('true');
+    wrapper.setProps({ value: false });
+    expect(wrapper.find('textarea').first().getDOMNode().value).toBe('false');
+  });
 });
